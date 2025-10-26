@@ -1,0 +1,40 @@
+@use "../main.scss" as *;
+
+.lists-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  list-style: none;
+  gap: 1rem;
+  position: relative;
+
+  .winning-line {
+    display: none;
+    width: 360px;
+    height: 50px;
+    background-color: #1fe00e;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    border-radius: 45px;
+    transform: translate(-50%, -50%) rotate(90deg);
+    transition: transform 0.3s ease;
+  }
+  .list {
+    width: 135px;
+    height: 135px;
+    border: 2px solid $accent;
+    border-radius: 20px;
+    background: $secondary-background;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    img {
+      max-width: 80px;
+      max-height: 80px;
+    }
+    &:hover {
+      cursor: pointer;
+    }
+  }
+}
