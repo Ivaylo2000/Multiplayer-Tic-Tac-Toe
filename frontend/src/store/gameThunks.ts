@@ -3,8 +3,8 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 export const createGame = createAsyncThunk(
   "game/createGame",
   async (playerName: string) => {
-    console.log(playerName);
-    const res = await fetch("http://localhost:3000/api/games/creategame", {
+    const apiUrl = process.env.REACT_APP_API_URL_CREATE_GAME!;
+    const res = await fetch(apiUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ playerName }),
@@ -16,8 +16,8 @@ export const createGame = createAsyncThunk(
 export const joinGame = createAsyncThunk(
   "game/joinGame",
   async ({ playerName, roomKey }: { playerName: string; roomKey: string }) => {
-    console.log("📡 Sending join request...");
-    const res = await fetch("http://localhost:3000/api/games/joingame", {
+    const apiUrl = process.env.REACT_APP_API_URL_jOIN_GAME!;
+    const res = await fetch(apiUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ playerName, roomKey }),

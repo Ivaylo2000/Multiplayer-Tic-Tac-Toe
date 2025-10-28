@@ -6,7 +6,7 @@ import {
   updateBoard,
   setCurrentTurn,
   updatePlayers,
-  startGame,
+  // startGame,
   updateScores,
 } from "../store/gameSlice";
 import styles from "./GamePage.module.scss";
@@ -41,10 +41,10 @@ const GamePage = () => {
     });
 
     // When game starts
-    socket.on("GAME_STARTED", (data) => {
-      console.log("Game started!");
-      dispatch(startGame());
-    });
+    // socket.on("GAME_STARTED", (data) => {
+    //   console.log("Game started!");
+    //   dispatch(startGame());
+    // });
 
     // When a move is made
     socket.on("MOVE_MADE", (data) => {

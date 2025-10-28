@@ -5,11 +5,11 @@ import { io, Socket } from "socket.io-client";
 export const useSocket = (roomKey: string, playerName: string) => {
   const socketRef = useRef<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
-
+  const apiUrl = process.env.REACT_APP_API_URL;
   useEffect(() => {
     if (!roomKey || !playerName) return;
 
-    socketRef.current = io("http://localhost:3000");
+    socketRef.current = io(apiUrl);
 
     socketRef.current.on("connect", () => {
       setIsConnected(true);
