@@ -11,6 +11,7 @@ interface GameState {
   currentTurn: string | null;
   players: string[];
   isCreator: boolean;
+  scores: { [playerName: string]: number }; // Add this
 }
 
 const initialState: GameState = {
@@ -27,6 +28,7 @@ const initialState: GameState = {
   currentTurn: null,
   players: [],
   isCreator: false,
+  scores: {},
 };
 
 const gameSlice = createSlice({
@@ -35,6 +37,9 @@ const gameSlice = createSlice({
   reducers: {
     updateGameState: (state, action) => {
       return { ...state, ...action.payload };
+    },
+    updateScores: (state, action) => {
+      state.scores = action.payload;
     },
     updateBoard: (state, action) => {
       state.board = action.payload;
@@ -79,6 +84,7 @@ export const {
   updatePlayers,
   startGame,
   resetGame,
+  updateScores,
 } = gameSlice.actions;
 
 export default gameSlice.reducer;

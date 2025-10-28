@@ -9,7 +9,10 @@ export interface Game {
   expirationTime: string;
   board: Board;
   currentTurn: string;
+  starterIndex: number;
   players: string[];
+  scores: { [playerName: string]: number };
+  winner?: string | null;
 }
 
 export const games: Game[] = [];

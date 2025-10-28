@@ -16,11 +16,23 @@ export const createGame = createAsyncThunk(
 export const joinGame = createAsyncThunk(
   "game/joinGame",
   async ({ playerName, roomKey }: { playerName: string; roomKey: string }) => {
+    console.log("📡 Sending join request...");
     const res = await fetch("http://localhost:3000/api/games/joingame", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ playerName, roomKey }),
     });
-    return res.json();
+
+    console.log("📡 Response status:", res.status);
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.log("❌ Error response:", errorText);
+      throw new Error(errorText);
+    }
+
+    const data = await res.json();
+    console.log("✅ Join response:", data);
+    return data;
   }
 );

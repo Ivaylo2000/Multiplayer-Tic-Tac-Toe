@@ -28,15 +28,22 @@ export const createGame = (req: Request, res: Response) => {
     expirationTime: expirationTime.toISOString(),
     board,
     currentTurn: playerName,
+    starterIndex: 0,
     players: [playerName],
+    scores: { [playerName]: 0 },
   };
 
   games.push(newGame);
-  console.log(newGame);
+
   res.status(201).json({
     roomKey: newGame.roomKey,
     playerName: newGame.playerName,
     players: newGame.players,
+  });
+};
+export const getGames = (req: Request, res: Response) => {
+  res.status(201).json({
+    games,
   });
 };
 
@@ -62,6 +69,7 @@ export const joinGame = (req: Request, res: Response) => {
     return res.status(400).json({ message: "Player name is required" });
   }
 
+  existingGame.scores[playerName] = 0;
   existingGame.players.push(playerName);
   const io = req.app.get("io");
   io.to(roomKey).emit("PLAYER_JOINED", {

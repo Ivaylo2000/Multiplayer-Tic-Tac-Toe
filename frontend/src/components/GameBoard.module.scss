@@ -9,16 +9,17 @@
   position: relative;
 
   .winning-line {
-    display: none;
+    // display: none;
     width: 360px;
     height: 50px;
-    background-color: #1fe00e;
+    background-color: $text;
     position: absolute;
     top: 50%;
     left: 50%;
     border-radius: 45px;
     transform: translate(-50%, -50%) rotate(90deg);
     transition: transform 0.3s ease;
+    z-index: 9999;
   }
   .list {
     width: 135px;
@@ -37,4 +38,10 @@
       cursor: pointer;
     }
   }
+}
+
+.locked {
+  pointer-events: none;
+  opacity: 0.6;
+  cursor: not-allowed;
 }
