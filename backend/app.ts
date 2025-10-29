@@ -29,8 +29,8 @@ const server = http.createServer(app);
 const io = setupSocketIO(server);
 app.set("io", io);
 // Start the server
-server.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
+server.listen(port, "0.0.0.0", () => {
+  console.log(`🎯 Server running on 0.0.0.0:${port}`);
 });
-
 export default app;
