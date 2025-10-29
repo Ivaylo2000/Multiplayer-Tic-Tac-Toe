@@ -4,10 +4,15 @@ import { Server as HttpServer } from "http";
 import { Board, games } from "../gamesandkeys/gamesandkeys";
 
 export const setupSocketIO = (server: HttpServer) => {
+  const rawClientUrl = process.env.CLIENT_URL || "";
+  const clientUrlNoSlash = rawClientUrl.replace(/\/$/, "");
+  const allowedOrigins = [clientUrlNoSlash, `${clientUrlNoSlash}/`];
+
   const io = new Server(server, {
     cors: {
-      origin: process.env.CLIENT_URL,
+      origin: allowedOrigins,
       methods: ["GET", "POST"],
+      credentials: true,
     },
   });
 
