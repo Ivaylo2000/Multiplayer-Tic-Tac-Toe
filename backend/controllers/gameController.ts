@@ -41,11 +41,6 @@ export const createGame = (req: Request, res: Response) => {
     players: newGame.players,
   });
 };
-export const getGames = (req: Request, res: Response) => {
-  res.status(201).json({
-    games,
-  });
-};
 
 export const joinGame = (req: Request, res: Response) => {
   const { playerName, roomKey } = req.body;
