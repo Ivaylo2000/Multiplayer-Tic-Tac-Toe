@@ -5,9 +5,11 @@ import http from "http";
 import gameRoutes from "./routes/gameRoutes";
 import bodyParser from "body-parser";
 import { setupSocketIO } from "./sockets/gameSocket";
+import dotenv from "dotenv";
+dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = Number(process.env.PORT) || 3000;
 
 // Middleware
 
@@ -29,8 +31,8 @@ const server = http.createServer(app);
 const io = setupSocketIO(server);
 app.set("io", io);
 // Start the server
-server.listen(process.env.PORT || 3000, "0.0.0.0", () => {
-  console.log(`🎯 Server running on 0.0.0.0:${process.env.PORT || 3000}`);
+server.listen(PORT, "0.0.0.0", () => {
+  console.log(`🎯 Server running on 0.0.0.0:${PORT}`);
 });
 
 export default app;
