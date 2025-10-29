@@ -39,7 +39,7 @@ body {
 section {
   max-width: 90%;
   margin: 0 auto;
-  padding: 50px 0;
+  // padding: 50px 0;
   display: flex;
   flex-direction: column;
   text-align: center;
@@ -47,7 +47,7 @@ section {
   gap: 2rem;
 
   @media screen and (max-width: 575px) {
-    padding: get-vw(50px, 575px) 0;
+    // padding: get-vw(50px, 575px) 0;
     gap: get-vw(32px, 575px);
   }
 

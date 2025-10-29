@@ -23,16 +23,12 @@ export const joinGame = createAsyncThunk(
       body: JSON.stringify({ playerName, roomKey }),
     });
 
-    console.log("📡 Response status:", res.status);
-
     if (!res.ok) {
       const errorText = await res.text();
-      console.log("❌ Error response:", errorText);
       throw new Error(errorText);
     }
 
     const data = await res.json();
-    console.log("✅ Join response:", data);
     return data;
   }
 );

@@ -17,8 +17,6 @@ export const setupSocketIO = (server: HttpServer) => {
   });
 
   io.on("connection", (socket) => {
-    console.log("User connected:", socket.id);
-
     // Join a game room
     socket.on(
       "JOIN_ROOM",
@@ -28,8 +26,6 @@ export const setupSocketIO = (server: HttpServer) => {
         socket.join(roomKey);
         (socket as any).roomKey = roomKey;
         (socket as any).playerName = playerName;
-
-        console.log(`Player ${playerName} joined room ${roomKey}`);
 
         // Get the updated game state with both players
         const game = games.find((g) => g.roomKey === roomKey);
@@ -44,11 +40,11 @@ export const setupSocketIO = (server: HttpServer) => {
     );
 
     // Start the game
-    socket.on("START_GAME", (roomKey: string) => {
-      io.to(roomKey).emit("GAME_STARTED", {
-        message: "Game is starting!",
-      });
-    });
+    // socket.on("START_GAME", (roomKey: string) => {
+    //   io.to(roomKey).emit("GAME_STARTED", {
+    //     message: "Game is starting!",
+    //   });
+    // });
 
     socket.on("CLEAR_BOARD", (roomKey: string) => {
       const game = games.find((g) => g.roomKey === roomKey);
@@ -67,8 +63,6 @@ export const setupSocketIO = (server: HttpServer) => {
 
       game.status = "in progress";
       game.winner = null;
-
-      console.log("Game reset for room:", roomKey);
 
       // Notify all players
       io.to(roomKey).emit("CLEAR_BOARD", {
@@ -89,10 +83,7 @@ export const setupSocketIO = (server: HttpServer) => {
         // Find the game
         const game = games.find((g) => g.roomKey === roomKey);
         if (!game) return;
-        console.log("🎮 BEFORE MOVE:");
-        console.log("  - currentTurn:", game.currentTurn);
-        console.log("  - player making move:", player);
-        console.log("  - players:", game.players);
+
         // Validate move
         if (game.currentTurn !== player || game.board[row][col] !== 0) {
           return; // Invalid move
@@ -105,7 +96,6 @@ export const setupSocketIO = (server: HttpServer) => {
         // Switch turns to the other player!
         game.currentTurn =
           game.players.find((p) => p !== player) || game.players[0];
-        console.log("🔄 TURN SWITCHED TO:", game.currentTurn);
 
         let winner = null;
 
@@ -172,11 +162,7 @@ export const setupSocketIO = (server: HttpServer) => {
 
           game.status = "finished";
           game.winner = winner;
-
-          console.log("Scores updated:", game.scores);
         }
-
-        console.log("Updated backend board:", game.board);
 
         // Send the updated game state to frontend
         io.to(roomKey).emit("MOVE_MADE", {
@@ -193,12 +179,20 @@ export const setupSocketIO = (server: HttpServer) => {
 
     // Handle disconnect
     socket.on("disconnect", () => {
-      console.log("User disconnected:", socket.id);
       const roomKey = (socket as any).roomKey;
+      const playerName = (socket as any).playerName;
+
       if (roomKey) {
-        socket.to(roomKey).emit("PLAYER_LEFT", {
-          playerName: (socket as any).playerName,
-        });
+        const gameIndex = games.findIndex((g) => g.roomKey === roomKey);
+        if (gameIndex > -1) {
+          io.to(roomKey).emit("ROOM_CLOSED", {
+            message: `${playerName} left the game`,
+            playerWhoLeft: playerName,
+            reason: "player_left",
+          });
+
+          games.splice(gameIndex, 1);
+        }
       }
     });
   });

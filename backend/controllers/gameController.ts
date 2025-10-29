@@ -80,7 +80,7 @@ export const joinGame = (req: Request, res: Response) => {
   if (existingGame.players.length === 2) {
     existingGame.status = "in progress";
   }
-  console.log(games);
+
   res.status(201).json({
     players: existingGame.players,
     roomKey: roomKey,

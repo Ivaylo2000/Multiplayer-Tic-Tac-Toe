@@ -7,19 +7,23 @@
   list-style: none;
   gap: 1rem;
   position: relative;
-
+  @media screen and (max-width: 575px) {
+    gap: get-vw(16px, 575px);
+  }
   .winning-line {
     // display: none;
-    width: 360px;
-    height: 50px;
+
+    height: 25px;
     background-color: $text;
     position: absolute;
-    top: 50%;
-    left: 50%;
+
     border-radius: 45px;
-    transform: translate(-50%, -50%) rotate(90deg);
-    transition: transform 0.3s ease;
     z-index: 9999;
+
+    @media screen and (max-width: 575px) {
+      border-radius: get-vw(45px, 575px);
+      height: get-vw(25px, 575px);
+    }
   }
   .list {
     width: 135px;
@@ -31,11 +35,20 @@
     justify-content: center;
     align-items: center;
     img {
-      max-width: 80px;
-      max-height: 80px;
+      width: 80px;
+      height: 80px;
     }
     &:hover {
       cursor: pointer;
+    }
+    @media screen and (max-width: 575px) {
+      width: get-vw(135px, 575px);
+      height: get-vw(135px, 575px);
+      border-radius: get-vw(20px, 575px);
+      img {
+        width: get-vw(80px, 575px);
+        height: get-vw(80px, 575px);
+      }
     }
   }
 }

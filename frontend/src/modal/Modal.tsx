@@ -52,12 +52,14 @@ const Modal = ({
           <>
             <input
               type="text"
+              name="roomkey"
               placeholder="Paste room key"
               value={roomKey}
               onChange={handleRoomKeyChange}
             />
             <input
               type="text"
+              name="nickname"
               placeholder="Enter your name"
               value={playerName}
               onChange={handlePlayerNameChange}

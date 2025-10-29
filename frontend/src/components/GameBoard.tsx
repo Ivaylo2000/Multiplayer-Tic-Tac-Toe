@@ -21,7 +21,6 @@ const GameBoard = ({
   winningLine,
 }: GameBoardProps) => {
   const handleClick = (row: number, col: number) => {
-    console.log({ currentTurn, playerName });
     if (currentTurn === playerName && board && board[row][col] === 0) {
       onCellClick(row, col);
     }
@@ -43,7 +42,7 @@ const GameBoard = ({
           left: "50%",
           transform: "translate(-50%, -50%)",
           width: "100%",
-          height: "15px",
+
           rotate: "0deg",
         };
 
@@ -60,7 +59,6 @@ const GameBoard = ({
           left: leftPosition,
           transform: "translate(-50%, -50%) rotate(90deg)",
           width: "100%",
-          height: "15px",
         };
 
       case "diagonal":
@@ -71,7 +69,6 @@ const GameBoard = ({
             left: "50%",
             transform: "translate(-50%, -50%) rotate(45deg)",
             width: "100%", // Longer for diagonal
-            height: "15px",
           };
         } else {
           // Diagonal from top-right to bottom-left
@@ -80,7 +77,6 @@ const GameBoard = ({
             left: "50%",
             transform: "translate(-50%, -50%) rotate(-45deg)",
             width: "100%",
-            height: "15px",
           };
         }
 

@@ -15,37 +15,39 @@
 .modal {
   background: $secondary-background;
 
-  border-radius: 10px;
+  border-radius: get-vw(10px, 575px);
 
   text-align: center;
   display: flex;
   flex-direction: column;
-  padding: get-vw(20px, 375px);
-  gap: get-vw(32px, 375px);
-  width: get-vw(400px, 375px);
-  height: get-vw(300px, 375px);
+  padding: get-vw(20px, 575px);
+  gap: get-vw(16px, 575px);
+  width: get-vw(400px, 575px);
+  height: get-vw(300px, 575px);
 
-  @media screen and (min-width: 375px) {
+  @media screen and (min-width: 576px) {
     width: 400px;
     height: 300px;
-    gap: 2rem;
+    gap: 1rem;
     padding: 20px;
+    border-radius: 10px;
   }
 
   input {
     outline: none;
     border: none;
-    border-radius: 10px;
-
+    border-radius: get-vw(10px, 575px);
     background: $text;
     display: flex;
     margin: auto 0;
-    padding: get-vw(10px, 375px);
-    @include get-fs-lh(16px, 16px, 375px);
-    @media screen and (min-width: 375px) {
+    padding: get-vw(10px, 575px);
+    @include get-fs-lh(16px, 16px, 575px);
+
+    @media screen and (min-width: 576px) {
       padding: 10px;
       font-size: 16px;
       line-height: 16px;
+      border-radius: 10px;
     }
     &::placeholder {
       color: $background;
@@ -65,6 +67,13 @@
     border-radius: 10px;
     flex: 1;
     color: $background;
+    padding: 10px 0;
+    @media screen and (max-width: 575px) {
+      @include get-fs-lh(20px, 32px, 575px);
+      padding: get-vw(10px, 575px) 0;
+      border-radius: get-vw(10px, 575px);
+    }
+
     &:hover {
       @include hover-animation;
     }

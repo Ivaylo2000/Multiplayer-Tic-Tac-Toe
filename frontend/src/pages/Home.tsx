@@ -21,7 +21,6 @@ const HomePage = () => {
 
     try {
       const result = await dispatch(createGame(playerName)).unwrap();
-      console.log("Game created:", result);
 
       navigate(`/game/${result.roomKey}`);
     } catch (error) {
@@ -38,7 +37,6 @@ const HomePage = () => {
 
     try {
       const result = await dispatch(joinGame({ playerName, roomKey })).unwrap();
-      console.log("Joined game:", result);
 
       navigate(`/game/${result.roomKey}`);
     } catch (error) {
@@ -57,7 +55,9 @@ const HomePage = () => {
   return (
     <section className={styles["home-section"]}>
       <div className={styles.heading}>
-        <h1>Hello ready to play some Tic-Tac-Toe</h1>
+        <h1>
+          Hello ready to play some <br /> Tic-Tac-Toe
+        </h1>
       </div>
 
       <div className={styles["button-holder"]}>

@@ -12,26 +12,63 @@
   align-items: center;
   justify-content: space-around;
   gap: 4rem;
+  @media screen and (max-width: 575px) {
+    gap: get-vw(65px, 575px);
+  }
 }
 
-// .room-link {
-//   // background: transparent;
-//   // color: white;
-//   // border: none;
-//   cursor: pointer;
-//   // max-width: 400px;
-//   padding: 5px 50px;
-// }
 .room-link-holder {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  // gap: 1rem;
   position: relative;
+}
+.player-one,
+.player-two {
+  h2 {
+    margin-right: get-vw(50px, 575px);
+    @media screen and (min-width: 576px) {
+      margin-right: 50px;
+    }
+  }
+}
+.player-name-arrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  img {
+    width: 40px;
+    height: 40px;
+    visibility: hidden;
+    &.visible {
+      visibility: visible;
+    }
+  }
+
+  @media screen and (max-width: 575px) {
+    gap: get-vw(10px, 575px);
+    img {
+      width: get-vw(40px, 575px);
+      height: get-vw(40px, 575px);
+    }
+  }
+}
+
+.clear-button {
+  padding: get-vw(5px, 575px) get-vw(25px, 575px);
+  font-weight: 700;
+  @media screen and (min-width: 576px) {
+    padding: 5px 25px;
+  }
+  &:hover {
+    cursor: pointer;
+  }
 }
 
 .room-link {
-  margin-top: 10px;
+  margin-top: 20px;
   padding: 8px 16px;
   border: none;
   border-radius: 8px;
@@ -39,6 +76,11 @@
   color: $text;
   cursor: pointer;
   transition: background 0.3s ease;
+  @media screen and (max-width: 575px) {
+    padding: get-vw(8px, 575px) get-vw(16px, 575px);
+    margin-top: get-vw(20px, 575px);
+    border-radius: get-vw(8px, 575px);
+  }
 }
 
 .room-link:hover {
