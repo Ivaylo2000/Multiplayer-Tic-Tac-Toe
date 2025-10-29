@@ -5,7 +5,8 @@ import { io, Socket } from "socket.io-client";
 export const useSocket = (roomKey: string, playerName: string) => {
   const socketRef = useRef<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
-  const apiUrl = process.env.REACT_APP_API_URL;
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
   useEffect(() => {
     if (!roomKey || !playerName) return;
 

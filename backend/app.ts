@@ -25,7 +25,7 @@ app.use(
 );
 // Routes
 app.use("/api/games", gameRoutes);
-app.get("/", (req, res) => res.send("Server is running!"));
+
 // Create HTTP server and setup Socket.io
 const server = http.createServer(app);
 const io = setupSocketIO(server);

@@ -3,8 +3,8 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 export const createGame = createAsyncThunk(
   "game/createGame",
   async (playerName: string) => {
-    const apiUrl = process.env.REACT_APP_API_URL_CREATE_GAME!;
-    const res = await fetch(apiUrl, {
+    const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+    const res = await fetch(`${API_URL}/api/games/creategame`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ playerName }),
@@ -16,8 +16,8 @@ export const createGame = createAsyncThunk(
 export const joinGame = createAsyncThunk(
   "game/joinGame",
   async ({ playerName, roomKey }: { playerName: string; roomKey: string }) => {
-    const apiUrl = process.env.REACT_APP_API_URL_jOIN_GAME!;
-    const res = await fetch(apiUrl, {
+    const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+    const res = await fetch(`${API_URL}/api/games/joingame`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ playerName, roomKey }),
