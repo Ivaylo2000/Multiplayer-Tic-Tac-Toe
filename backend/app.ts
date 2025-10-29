@@ -12,13 +12,21 @@ const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 
 // Middleware
+const clientUrl = process.env.CLIENT_URL;
+const allowedOrigins = [clientUrl, clientUrl?.replace(/\/$/, "")];
 
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "*",
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
