@@ -43,6 +43,7 @@
   .return {
     color: $text;
     text-decoration: none;
+    font-weight: 600;
     @include get-fs-lh(24px, 30px, 575px);
     @media screen and (min-width: 576px) {
       font-size: 24px;
