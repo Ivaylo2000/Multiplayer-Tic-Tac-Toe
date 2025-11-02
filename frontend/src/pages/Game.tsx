@@ -11,7 +11,8 @@ import {
 import styles from "./GamePage.module.scss";
 import GameBoard from "../components/GameBoard";
 import { useNavigate } from "react-router-dom";
-import arrowLeft from "../assets/arrow-left.png";
+import Button from "../components/Button";
+import PlayerScoreCard from "../components/PlayerScoreCard";
 
 interface PlayerJoinedData {
   message: string;
@@ -114,6 +115,7 @@ const GamePage = () => {
       dispatch(updateBoard(board));
       dispatch(setCurrentTurn(currentTurn));
       setWinningLine(null);
+      setWinner(null);
       if (scores) {
         dispatch(updateScores(scores));
       }
@@ -173,9 +175,9 @@ const GamePage = () => {
   return (
     <section className={styles["game-page-section"]}>
       {isCreator && winner && (
-        <button onClick={handleClearBoard} className={styles["clear-button"]}>
+        <Button onClick={handleClearBoard} className={styles["clear-button"]}>
           Clear Board
-        </button>
+        </Button>
       )}
 
       {roomKey && players.length < 2 && (
@@ -188,43 +190,28 @@ const GamePage = () => {
             </p>
           )}
           <h1> Room key: {roomKey}</h1>
-          <button
+          <Button
             onClick={() => copyToClipboard(roomKey)}
             className={styles["room-link"]}
           >
             Copy Room Link
-          </button>
+          </Button>
         </div>
       )}
 
       <div className={styles["players-score"]}>
-        <div className={styles["player"]}>
-          <h2>score: {scores[players[0]] || 0}</h2>
-          <div className={styles["player-name-arrow"]}>
-            <h1>{players[0]} - X</h1>
-            <img
-              src={arrowLeft}
-              alt="Current turn"
-              className={
-                currentTurn === players[0] ? styles.visible : undefined
-              }
-            />
-          </div>
-        </div>
-
-        <div className={styles["player"]}>
-          <h2>score: {scores[players[1]] || 0}</h2>
-          <div className={styles["player-name-arrow"]}>
-            <h1>{players[1]} - O</h1>
-            <img
-              src={arrowLeft}
-              alt="Current turn"
-              className={
-                currentTurn === players[1] ? styles.visible : undefined
-              }
-            />
-          </div>
-        </div>
+        {players.map((player, index) => (
+          <PlayerScoreCard
+            key={player}
+            playerName={player}
+            symbol={index === 0 ? "X" : "O"}
+            score={scores[player] || 0}
+            isCurrentTurn={currentTurn === player}
+            playerClass={styles.player}
+            nameArrowClass={styles["player-name-arrow"]}
+            visibleClass={styles.visible}
+          />
+        ))}
       </div>
       <GameBoard
         board={board}
