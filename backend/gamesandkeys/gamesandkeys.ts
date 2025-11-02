@@ -1,6 +1,5 @@
 export type Board = (string | null | number)[][];
 
-// Define the Game interface
 export interface Game {
   id: string;
   playerName: string;
