@@ -1,4 +1,3 @@
-// hooks/useSocket.ts
 import { useEffect, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import { updateBoard } from "../store/gameSlice";

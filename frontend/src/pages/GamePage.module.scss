@@ -21,11 +21,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  // gap: 1rem;
   position: relative;
 }
-.player-one,
-.player-two {
+.player {
   h2 {
     margin-right: get-vw(50px, 575px);
     @media screen and (min-width: 576px) {

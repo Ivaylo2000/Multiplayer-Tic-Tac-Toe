@@ -1,6 +1,7 @@
 import styles from "./GameBoard.module.scss";
 import elipse from "../assets/elipse.png";
 import cross from "../assets/cross.png";
+
 interface GameBoardProps {
   board: number[][];
   currentTurn: string | null;
@@ -68,7 +69,7 @@ const GameBoard = ({
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%) rotate(45deg)",
-            width: "100%", // Longer for diagonal
+            width: "100%",
           };
         } else {
           // Diagonal from top-right to bottom-left
@@ -86,7 +87,7 @@ const GameBoard = ({
   };
   return (
     <section>
-      {players && players.length === 2 ? (
+      {players && players.length === 2 && (
         <div className={styles["board"]}>
           <ul className={styles["lists-container"]}>
             {winner && winningLine && (
@@ -116,8 +117,6 @@ const GameBoard = ({
               )}
           </ul>
         </div>
-      ) : (
-        ""
       )}
     </section>
   );

@@ -21,7 +21,6 @@ const Modal = ({
   roomKey,
   setRoomKey,
 }: ModalProps) => {
-  // Handle input changes
   const handlePlayerNameChange = (e: ChangeEvent<HTMLInputElement>) => {
     setPlayerName(e.target.value);
   };
@@ -30,7 +29,6 @@ const Modal = ({
     setRoomKey(e.target.value);
   };
 
-  // Prevent modal from closing when clicking inside the modal
   const handleModalClick = (e: React.MouseEvent) => {
     e.stopPropagation();
   };
@@ -40,7 +38,6 @@ const Modal = ({
       <div className={styles.modal} onClick={handleModalClick}>
         <h1>{type === "create" ? "Create a Room" : "Enter a Room"}</h1>
 
-        {/* Conditional rendering of inputs based on modal type */}
         {type === "create" ? (
           <input
             type="text"
