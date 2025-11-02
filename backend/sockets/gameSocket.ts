@@ -1,7 +1,6 @@
-// backend/sockets/gameSocket.ts
 import { Server } from "socket.io";
 import { Server as HttpServer } from "http";
-import { Board, games } from "../gamesandkeys/gamesandkeys";
+import { games } from "../gamesandkeys/gamesandkeys";
 
 export const setupSocketIO = (server: HttpServer) => {
   const rawClientUrl = process.env.CLIENT_URL || "";
@@ -40,7 +39,6 @@ export const setupSocketIO = (server: HttpServer) => {
       const game = games.find((g) => g.roomKey === roomKey);
       if (!game) return;
 
-      // Reset the board
       game.board = [
         [0, 0, 0],
         [0, 0, 0],

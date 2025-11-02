@@ -51,6 +51,10 @@ export const joinGame = (req: Request, res: Response) => {
     return res.status(400).json({ message: "Game Not Found" });
   }
 
+  if (existingGame.players.includes(playerName)) {
+    return res.status(400).json({ message: "Player name is taken" });
+  }
+
   const currentTime = moment();
   if (moment(existingGame.expirationTime).isBefore(currentTime)) {
     return res.status(400).json({ message: "Game has expired" });
