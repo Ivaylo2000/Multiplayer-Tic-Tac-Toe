@@ -1,4 +1,5 @@
 import Button from "../components/Button";
+import Input from "../components/Input";
 import styles from "./Modal.module.scss";
 import type { ChangeEvent } from "react";
 
@@ -39,22 +40,24 @@ const Modal = ({
         <h1>{type === "create" ? "Create a Room" : "Enter a Room"}</h1>
 
         {type === "create" ? (
-          <input
+          <Input
             type="text"
             placeholder="Enter your name"
             value={playerName}
             onChange={handlePlayerNameChange}
+            className={styles.input}
           />
         ) : (
           <>
-            <input
+            <Input
               type="text"
               name="roomkey"
               placeholder="Paste room key"
               value={roomKey}
               onChange={handleRoomKeyChange}
             />
-            <input
+
+            <Input
               type="text"
               name="nickname"
               placeholder="Enter your name"
