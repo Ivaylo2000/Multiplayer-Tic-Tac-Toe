@@ -11,7 +11,7 @@ interface GameState {
   currentTurn: string | null;
   players: string[];
   isCreator: boolean;
-  scores: { [playerName: string]: number }; // Add this
+  scores: { [playerName: string]: number };
 }
 
 const initialState: GameState = {

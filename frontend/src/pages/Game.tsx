@@ -1,5 +1,4 @@
-// GamePage.tsx
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSocket } from "../hooks/useSocket";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import {
@@ -14,6 +13,31 @@ import GameBoard from "../components/GameBoard";
 import { useNavigate } from "react-router-dom";
 import arrowLeft from "../assets/arrow-left.png";
 
+interface PlayerJoinedData {
+  message: string;
+  newPlayer: string;
+  players: string[];
+}
+
+interface ClearBoardData {
+  board: number[][];
+  currentTurn: string;
+  scores: { [playerName: string]: number };
+  status: string;
+  winner: string | null;
+}
+
+interface MoveMadeData extends ClearBoardData {
+  playerWhoMoved: string;
+  winningLine: any | null;
+}
+
+interface RoomClosedData {
+  message: string;
+  playerWhoLeft: string;
+  reason: string;
+}
+
 const GamePage = () => {
   const dispatch = useAppDispatch();
 
@@ -27,63 +51,88 @@ const GamePage = () => {
     scores,
   } = useAppSelector((state) => state.game);
 
-  // Initialize WebSocket connection
   const { socket } = useSocket(roomKey || "", playerName || "");
   const [winner, setWinner] = useState<string | null>(null);
   const [copied, setCopied] = useState<boolean>(false);
   const [winningLine, setWinningLine] = useState<any>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
   const navigate = useNavigate();
-  // Listen for WebSocket events
+
+  const startInactivityTimer = () => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+
+    timerRef.current = setTimeout(() => {
+      if (socket && roomKey) {
+        socket.emit("ROOM_INACTIVITY_CLOSE", roomKey);
+      }
+      dispatch(resetGame());
+      alert("Game ended due to 3 minutes of inactivity");
+      navigate("/");
+    }, 180000);
+  };
+
+  const resetInactivityTimer = () => {
+    startInactivityTimer();
+  };
+
   useEffect(() => {
     if (!socket) return;
 
-    // When a player joins
-    socket.on("PLAYER_JOINED", (data) => {
-      dispatch(updatePlayers(data.players));
+    startInactivityTimer();
+
+    socket.on("PLAYER_JOINED", (data: PlayerJoinedData) => {
+      const { players } = data;
+      dispatch(updatePlayers(players));
     });
 
-    // When game starts
-    // socket.on("GAME_STARTED", (data) => {
-    //   dispatch(startGame());
-    // });
+    socket.on("MOVE_MADE", (data: MoveMadeData) => {
+      const { board, currentTurn, scores, winner, winningLine } = data;
+      dispatch(updateBoard(board));
+      dispatch(setCurrentTurn(currentTurn));
 
-    // When a move is made
-    socket.on("MOVE_MADE", (data) => {
-      dispatch(updateBoard(data.board));
-      dispatch(setCurrentTurn(data.currentTurn));
-
-      if (data.scores) {
-        dispatch(updateScores(data.scores));
+      if (scores) {
+        dispatch(updateScores(scores));
       }
 
-      if (data.winner) {
-        setWinningLine(data.winningLine);
-        setWinner(data.winner);
+      if (winner) {
+        setWinningLine(winningLine);
+        setWinner(winner);
       } else {
         setWinner(null);
         setWinningLine(null);
       }
+
+      resetInactivityTimer();
     });
 
-    socket.on("CLEAR_BOARD", (data) => {
-      dispatch(updateBoard(data.board));
-      dispatch(setCurrentTurn(data.currentTurn));
+    socket.on("CLEAR_BOARD", (data: ClearBoardData) => {
+      const { board, currentTurn, scores } = data;
+
+      dispatch(updateBoard(board));
+      dispatch(setCurrentTurn(currentTurn));
       setWinningLine(null);
-      if (data.scores) {
-        dispatch(updateScores(data.scores));
+      if (scores) {
+        dispatch(updateScores(scores));
       }
+
+      resetInactivityTimer();
     });
 
-    socket.on("ROOM_CLOSED", (data) => {
+    socket.on("ROOM_CLOSED", (data: RoomClosedData) => {
+      const { message, playerWhoLeft } = data;
       dispatch(resetGame());
-      alert(
-        `Game ended: ${data.message} player - ${data.playerWhoLeft} left the lobby`
-      );
-
+      alert(`Game ended: ${message} player - ${playerWhoLeft} left the lobby`);
       navigate("/");
     });
-    // Clean up listeners
+
     return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
       socket.off("PLAYER_JOINED");
       socket.off("GAME_STARTED");
       socket.off("MOVE_MADE");
@@ -93,7 +142,6 @@ const GamePage = () => {
 
   const handleCellClick = (row: number, col: number) => {
     if (socket && roomKey && playerName) {
-      // Send move to server via WebSocket
       socket.emit("MAKE_MOVE", {
         roomKey,
         row,
@@ -102,12 +150,6 @@ const GamePage = () => {
       });
     }
   };
-
-  // const handleStartGame = () => {
-  //   if (socket && roomKey && isCreator) {
-  //     socket.emit("START_GAME", roomKey);
-  //   }
-  // };
 
   const handleClearBoard = () => {
     if (socket && roomKey && isCreator) {
@@ -130,30 +172,20 @@ const GamePage = () => {
 
   return (
     <section className={styles["game-page-section"]}>
-      {/* Show start button if creator and 2 players */}
-      {/* {isCreator && players.length === 2 && (
-        <button onClick={handleStartGame} className={styles["start-button"]}>
-          Start Game
-        </button>
-      )} */}
-
       {isCreator && winner && (
         <button onClick={handleClearBoard} className={styles["clear-button"]}>
           Clear Board
         </button>
       )}
 
-      {/* Show room key  */}
       {roomKey && players.length < 2 && (
         <div className={styles["room-link-holder"]}>
-          {copied ? (
+          {copied && (
             <p
               className={`${styles["copied-notification"]} ${styles["fade-in-out"]}`}
             >
               Text copied!
             </p>
-          ) : (
-            ""
           )}
           <h1> Room key: {roomKey}</h1>
           <button
@@ -166,40 +198,31 @@ const GamePage = () => {
       )}
 
       <div className={styles["players-score"]}>
-        <div className={styles["player-one"]}>
+        <div className={styles["player"]}>
           <h2>score: {scores[players[0]] || 0}</h2>
           <div className={styles["player-name-arrow"]}>
             <h1>{players[0]} - X</h1>
             <img
               src={arrowLeft}
               alt="Current turn"
-              className={currentTurn === players[0] ? styles.visible : ""}
+              className={
+                currentTurn === players[0] ? styles.visible : undefined
+              }
             />
-            {/* {currentTurn === players[0] && (
-              <img
-                src={arrowLeft}
-                alt="Current turn"
-                className={currentTurn === players[0] ? styles.visible : ""}
-              />
-            )} */}
           </div>
         </div>
-        <div className={styles["player-two"]}>
+
+        <div className={styles["player"]}>
           <h2>score: {scores[players[1]] || 0}</h2>
           <div className={styles["player-name-arrow"]}>
             <h1>{players[1]} - O</h1>
             <img
               src={arrowLeft}
               alt="Current turn"
-              className={currentTurn === players[1] ? styles.visible : ""}
+              className={
+                currentTurn === players[1] ? styles.visible : undefined
+              }
             />
-            {/* {currentTurn === players[1] && (
-              <img
-                src={arrowLeft}
-                alt="Current turn"
-                className={currentTurn === players[1] ? styles.visible : ""}
-              />
-            )} */}
           </div>
         </div>
       </div>

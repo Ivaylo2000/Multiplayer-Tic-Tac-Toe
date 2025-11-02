@@ -17,7 +17,6 @@ export const setupSocketIO = (server: HttpServer) => {
   });
 
   io.on("connection", (socket) => {
-    // Join a game room
     socket.on(
       "JOIN_ROOM",
       async (data: { roomKey: string; playerName: string }) => {
@@ -27,10 +26,8 @@ export const setupSocketIO = (server: HttpServer) => {
         (socket as any).roomKey = roomKey;
         (socket as any).playerName = playerName;
 
-        // Get the updated game state with both players
         const game = games.find((g) => g.roomKey === roomKey);
 
-        // Notify others in the room with full players list
         socket.to(roomKey).emit("PLAYER_JOINED", {
           players: game?.players || [playerName],
           newPlayer: playerName,
@@ -38,13 +35,6 @@ export const setupSocketIO = (server: HttpServer) => {
         });
       }
     );
-
-    // Start the game
-    // socket.on("START_GAME", (roomKey: string) => {
-    //   io.to(roomKey).emit("GAME_STARTED", {
-    //     message: "Game is starting!",
-    //   });
-    // });
 
     socket.on("CLEAR_BOARD", (roomKey: string) => {
       const game = games.find((g) => g.roomKey === roomKey);
@@ -57,14 +47,12 @@ export const setupSocketIO = (server: HttpServer) => {
         [0, 0, 0],
       ];
 
-      // Alternate who starts first (so it's fair)
       game.starterIndex = (game.starterIndex + 1) % 2;
       game.currentTurn = game.players[game.starterIndex];
 
       game.status = "in progress";
       game.winner = null;
 
-      // Notify all players
       io.to(roomKey).emit("CLEAR_BOARD", {
         board: game.board,
         currentTurn: game.currentTurn,
@@ -74,33 +62,28 @@ export const setupSocketIO = (server: HttpServer) => {
       });
     });
 
-    // Handle player move
     socket.on(
       "MAKE_MOVE",
       (data: { roomKey: string; row: number; col: number; player: string }) => {
         const { roomKey, row, col, player } = data;
 
-        // Find the game
         const game = games.find((g) => g.roomKey === roomKey);
         if (!game) return;
 
-        // Validate move
         if (game.currentTurn !== player || game.board[row][col] !== 0) {
-          return; // Invalid move
+          return;
         }
 
-        // Update the board
         const symbol = game.players[0] === player ? 1 : 2;
         game.board[row][col] = symbol;
 
-        // Switch turns to the other player!
         game.currentTurn =
           game.players.find((p) => p !== player) || game.players[0];
 
         let winner = null;
 
         let winningLine = null;
-        // Check for win
+
         for (let i = 0; i < 3; i++) {
           if (
             game.board[i][0] !== 0 &&
@@ -143,7 +126,6 @@ export const setupSocketIO = (server: HttpServer) => {
           winningLine = { type: "diagonal", direction: "anti" }; // Anti-diagonal
         }
 
-        // Check for draw (if no winner and all cells filled)
         if (!winner) {
           const isBoardFull = game.board.flat().every((cell) => cell !== 0);
           game.currentTurn =
@@ -153,9 +135,7 @@ export const setupSocketIO = (server: HttpServer) => {
           }
         }
 
-        // Update game state
         if (winner) {
-          // Update the score!
           if (winner !== "draw") {
             game.scores[winner] = (game.scores[winner] || 0) + 1;
           }
@@ -164,7 +144,6 @@ export const setupSocketIO = (server: HttpServer) => {
           game.winner = winner;
         }
 
-        // Send the updated game state to frontend
         io.to(roomKey).emit("MOVE_MADE", {
           board: game.board,
           currentTurn: game.currentTurn,
@@ -177,7 +156,13 @@ export const setupSocketIO = (server: HttpServer) => {
       }
     );
 
-    // Handle disconnect
+    socket.on("ROOM_INACTIVITY_CLOSE", (roomKey: string) => {
+      const gameIndex = games.findIndex((g) => g.roomKey === roomKey);
+      if (gameIndex > -1) {
+        games.splice(gameIndex, 1);
+      }
+    });
+
     socket.on("disconnect", () => {
       const roomKey = (socket as any).roomKey;
       const playerName = (socket as any).playerName;
