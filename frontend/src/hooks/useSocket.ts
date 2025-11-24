@@ -16,7 +16,6 @@ export const useSocket = (roomKey: string, playerName: string) => {
 
     socketRef.current.on("connect", () => {
       setIsConnected(true);
-
       dispatch(
         updateBoard([
           [0, 0, 0],
@@ -24,7 +23,6 @@ export const useSocket = (roomKey: string, playerName: string) => {
           [0, 0, 0],
         ])
       );
-
       socketRef.current?.emit("JOIN_ROOM", { roomKey, playerName });
     });
 
@@ -32,14 +30,13 @@ export const useSocket = (roomKey: string, playerName: string) => {
       setIsConnected(false);
     });
 
-    const handleBeforeUnload = () => {
-      socketRef.current?.emit("PLAYER_LEAVING");
-    };
-    window.addEventListener("beforeunload", handleBeforeUnload);
-
     return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-      socketRef.current?.emit("PLAYER_LEAVING");
+      const existing = localStorage.getItem("pendingRejoin");
+      if (existing) {
+        const gameInfo = JSON.parse(existing);
+        gameInfo.disconnectedAt = Date.now();
+        localStorage.setItem("pendingRejoin", JSON.stringify(gameInfo));
+      }
       socketRef.current?.disconnect();
     };
   }, [roomKey, playerName]);

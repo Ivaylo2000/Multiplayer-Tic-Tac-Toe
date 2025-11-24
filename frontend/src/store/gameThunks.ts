@@ -9,7 +9,18 @@ export const createGame = createAsyncThunk(
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ playerName }),
     });
-    return res.json();
+
+    const data = await res.json();
+
+    localStorage.setItem(
+      "pendingRejoin",
+      JSON.stringify({
+        roomKey: data.roomKey,
+        playerName: data.playerName,
+      })
+    );
+
+    return data;
   }
 );
 
@@ -29,6 +40,16 @@ export const joinGame = createAsyncThunk(
     }
 
     const data = await res.json();
+
+    console.log(data);
+
+    localStorage.setItem(
+      "pendingRejoin",
+      JSON.stringify({
+        roomKey: data.roomKey,
+        playerName: data.playerName,
+      })
+    );
     return data;
   }
 );

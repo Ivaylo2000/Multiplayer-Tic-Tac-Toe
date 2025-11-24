@@ -5,20 +5,24 @@ import GamePage from "./pages/Game";
 import NotFound from "./pages/NotFound";
 import { Provider } from "react-redux";
 import { store } from "./store/store";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   return (
-    <Provider store={store}>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
+    <>
+      <Toaster position="top-center" />
+      <Provider store={store}>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
 
-          <Route path="/game/:roomId" element={<GamePage />} />
+            <Route path="/game/:roomId" element={<GamePage />} />
 
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </Provider>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </Provider>
+    </>
   );
 }
 
