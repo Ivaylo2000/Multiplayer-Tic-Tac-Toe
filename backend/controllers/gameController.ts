@@ -29,7 +29,14 @@ export const createGame = (req: Request, res: Response) => {
     board,
     currentTurn: playerName,
     starterIndex: 0,
-    players: [playerName],
+    players: [
+      {
+        id: uuidv4(),
+        name: playerName,
+        status: "connected",
+        reconnectBudget: 120000,
+      },
+    ],
     scores: { [playerName]: 0 },
   };
 
@@ -51,6 +58,10 @@ export const joinGame = (req: Request, res: Response) => {
     return res.status(400).json({ message: "Game Not Found" });
   }
 
+  if (existingGame.players.some((p) => p.name === playerName)) {
+    return res.status(400).json({ message: "Player name is taken" });
+  }
+
   const currentTime = moment();
   if (moment(existingGame.expirationTime).isBefore(currentTime)) {
     return res.status(400).json({ message: "Game has expired" });
@@ -65,10 +76,17 @@ export const joinGame = (req: Request, res: Response) => {
   }
 
   existingGame.scores[playerName] = 0;
-  existingGame.players.push(playerName);
+
+  existingGame.players.push({
+    id: uuidv4(),
+    name: playerName,
+    status: "connected",
+    reconnectBudget: 120000,
+  });
+
   const io = req.app.get("io");
   io.to(roomKey).emit("PLAYER_JOINED", {
-    players: existingGame.players,
+    players: existingGame.players.map((p) => p.name),
     newPlayer: playerName,
   });
 
@@ -77,7 +95,26 @@ export const joinGame = (req: Request, res: Response) => {
   }
 
   res.status(201).json({
-    players: existingGame.players,
+    players: existingGame.players.map((p) => p.name),
+    playerName: playerName,
     roomKey: roomKey,
   });
+};
+
+export const showRooms = (req: Request, res: Response) => {
+  res.status(201).json({
+    games: games,
+  });
+};
+
+export const chechExistingGame = (req: Request, res: Response) => {
+  const { roomKey } = req.params;
+  console.log("room", roomKey);
+  const game = games.find((g) => g.roomKey === roomKey);
+  console.log("gamme", game);
+  if (game) {
+    res.json({ exists: true, status: game.status });
+  } else {
+    res.json({ exists: false });
+  }
 };

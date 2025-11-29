@@ -10,9 +10,10 @@ import {
 } from "../store/gameSlice";
 import styles from "./GamePage.module.scss";
 import GameBoard from "../components/GameBoard";
-import { useNavigate } from "react-router-dom";
 import Button from "../components/Button";
 import PlayerScoreCard from "../components/PlayerScoreCard";
+import { useNavigate, useLocation } from "react-router-dom";
+import toast from "react-hot-toast";
 
 interface PlayerJoinedData {
   message: string;
@@ -58,6 +59,7 @@ const GamePage = () => {
   const [winningLine, setWinningLine] = useState<any>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
+  const location = useLocation();
   const navigate = useNavigate();
 
   const startInactivityTimer = () => {
@@ -70,7 +72,7 @@ const GamePage = () => {
         socket.emit("ROOM_INACTIVITY_CLOSE", roomKey);
       }
       dispatch(resetGame());
-      alert("Game ended due to 3 minutes of inactivity");
+      toast.error("Game ended due to 3 minutes of inactivity");
       navigate("/");
     }, 180000);
   };
@@ -78,6 +80,16 @@ const GamePage = () => {
   const resetInactivityTimer = () => {
     startInactivityTimer();
   };
+
+  useEffect(() => {
+    if (socket && location.state?.rejoin) {
+      console.log("🔄 Rejoining game...");
+      socket.emit("PLAYER_RECONNECT", {
+        roomKey: location.state.roomKey,
+        playerName: location.state.playerName,
+      });
+    }
+  }, [socket, location.state]);
 
   useEffect(() => {
     if (!socket) return;
@@ -124,13 +136,41 @@ const GamePage = () => {
     });
 
     socket.on("ROOM_CLOSED", (data: RoomClosedData) => {
+      localStorage.removeItem("pendingRejoin");
       const { message, playerWhoLeft } = data;
       dispatch(resetGame());
-      alert(`Game ended: ${message} player - ${playerWhoLeft} left the lobby`);
+      toast.error(
+        `Game ended: ${message} player - ${playerWhoLeft} left the lobby`
+      );
       navigate("/");
     });
 
+    socket.on("PLAYER_DISCONNECTED", (data) => {
+      toast.error(`${data.message}`);
+    });
+
+    socket.on("PLAYER_RECONNECTED", (data) => {
+      console.log("🔄 PLAYER_RECONNECTED received:", data);
+      dispatch(updateBoard(data.board));
+      dispatch(setCurrentTurn(data.currentTurn));
+      dispatch(updatePlayers(data.players));
+      if (data.scores) {
+        dispatch(updateScores(data.scores));
+      }
+      if (data.winner) {
+        setWinner(data.winner);
+      }
+      toast.success(`${data.message}`);
+    });
+
     return () => {
+      const existing = localStorage.getItem("pendingRejoin");
+      if (existing) {
+        const gameInfo = JSON.parse(existing);
+        gameInfo.disconnectedAt = Date.now();
+        localStorage.setItem("pendingRejoin", JSON.stringify(gameInfo));
+      }
+
       if (timerRef.current) {
         clearTimeout(timerRef.current);
         timerRef.current = null;
@@ -139,6 +179,8 @@ const GamePage = () => {
       socket.off("GAME_STARTED");
       socket.off("MOVE_MADE");
       socket.off("ROOM_CLOSED");
+      socket.off("PLAYER_DISCONNECTED");
+      socket.off("PLAYER_RECONNECTED");
     };
   }, [socket, dispatch]);
 

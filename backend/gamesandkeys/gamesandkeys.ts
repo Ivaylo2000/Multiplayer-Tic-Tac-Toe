@@ -1,6 +1,16 @@
 export type Board = (string | null | number)[][];
 
-// Define the Game interface
+export interface Player {
+  id: string;
+  name: string;
+  status: "connected" | "disconnected";
+  disconnectedAt?: Date;
+  socketId?: string;
+  reconnectTimer?: NodeJS.Timeout;
+  reconnectBudget: number;
+  remainingTime?: number;
+}
+
 export interface Game {
   id: string;
   playerName: string;
@@ -10,7 +20,7 @@ export interface Game {
   board: Board;
   currentTurn: string;
   starterIndex: number;
-  players: string[];
+  players: Player[];
   scores: { [playerName: string]: number };
   winner?: string | null;
 }
